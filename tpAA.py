@@ -1,9 +1,10 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from random import shuffle
+import time
 
-filename = "facebook_combined.txt"
-#filename = "test.txt"
+#filename = "facebook_combined.txt"
+filename = "test.txt"
 with open(filename) as file:
     DS = [tuple(line.rstrip('\n').split(' ')) for line in file]
 shuffle(DS)
@@ -16,14 +17,17 @@ GTest.add_edges_from(DS[DSDiv:DSLen])
 print("Datasets created")
 
 ##Adamic-Adar------------------------------------------------------------
+start_time = time.clock() #BEGIN
 GTestScore = nx.Graph()
 for i in nx.adamic_adar_index(G):
     if i[2] > 0:
         if GTest.has_edge(i[0],i[1]) or GTest.has_edge(i[1],i[0]):
             GTestScore.add_edge(i[0],i[1],score=i[2])
+print("Tiempo: ",time.clock() - start_time) #END
 print("Precision: ",GTestScore.number_of_edges()/GTest.number_of_edges())
 
 ##Common Neighbors--------------------------------------------------------
+#start_time = time.clock() #BEGIN
 #GScore = nx.Graph()
 #GTestScore = nx.Graph()
 #nodeList = G.nodes()
@@ -35,6 +39,7 @@ print("Precision: ",GTestScore.number_of_edges()/GTest.number_of_edges())
 #            GScore.add_edge(n,nn,score=scoreCN)
 #            if (GTest.has_edge(n,nn) or GTest.has_edge(nn,n)) and not GTestScore.has_edge(n,nn) and not GTestScore.has_edge(nn,n):
 #                GTestScore.add_edge(n,nn,score=scoreCN)
+#print("Tiempo: ",time.clock() - start_time) #END
 #print("Precision: ",GTestScore.number_of_edges()/GTest.number_of_edges())
 
 
