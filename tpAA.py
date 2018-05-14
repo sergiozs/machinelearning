@@ -1,5 +1,5 @@
 import networkx as nx
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from random import shuffle
 import time
 
@@ -14,20 +14,32 @@ G = nx.Graph()
 G.add_edges_from(DS[0:DSDiv])
 GTest = nx.Graph()
 GTest.add_edges_from(DS[DSDiv:DSLen])
-print("Datasets created")
 
-##Adamic-Adar------------------------------------------------------------
-start_time = time.clock() #BEGIN
+##Katz-------------------------------------------------------------------
+print("KATZ")
+start_time = time.time() #BEGIN
 GTestScore = nx.Graph()
-for i in nx.adamic_adar_index(G):
+for i in nx.centrality_katz_numpy(G):
     if i[2] > 0:
         if GTest.has_edge(i[0],i[1]) or GTest.has_edge(i[1],i[0]):
             GTestScore.add_edge(i[0],i[1],score=i[2])
-print("Tiempo: ",time.clock() - start_time) #END
+print("Tiempo: ",time.time() - start_time) #END
 print("Precision: ",GTestScore.number_of_edges()/GTest.number_of_edges())
 
+##Adamic-Adar------------------------------------------------------------
+#print("ADAMIC-ADAR")
+#start_time = time.time() #BEGIN
+#GTestScore = nx.Graph()
+#for i in nx.adamic_adar_index(G):
+#    if i[2] > 0:
+#        if GTest.has_edge(i[0],i[1]) or GTest.has_edge(i[1],i[0]):
+#            GTestScore.add_edge(i[0],i[1],score=i[2])
+#print("Tiempo: ",time.time() - start_time) #END
+#print("Precision: ",GTestScore.number_of_edges()/GTest.number_of_edges())
+
 ##Common Neighbors--------------------------------------------------------
-#start_time = time.clock() #BEGIN
+#print("COMMON NEIGHBORS")
+#start_time = time.time() #BEGIN
 #GScore = nx.Graph()
 #GTestScore = nx.Graph()
 #nodeList = G.nodes()
@@ -39,9 +51,8 @@ print("Precision: ",GTestScore.number_of_edges()/GTest.number_of_edges())
 #            GScore.add_edge(n,nn,score=scoreCN)
 #            if (GTest.has_edge(n,nn) or GTest.has_edge(nn,n)) and not GTestScore.has_edge(n,nn) and not GTestScore.has_edge(nn,n):
 #                GTestScore.add_edge(n,nn,score=scoreCN)
-#print("Tiempo: ",time.clock() - start_time) #END
+#print("Tiempo: ",time.time() - start_time) #END
 #print("Precision: ",GTestScore.number_of_edges()/GTest.number_of_edges())
-
 
 #nx.draw(G, with_labels=True, font_weight='bold')
 #plt.show()
