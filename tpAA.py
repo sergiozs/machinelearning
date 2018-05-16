@@ -191,8 +191,8 @@ def _is_converge(s1, s2, eps=1e-4):
 ##------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    #filename = "facebook_combined.txt"
-    filename = "test.txt"
+    filename = "facebook_combined.txt"
+    #filename = "test.txt"
     with open(filename) as file:
         DS = [tuple(line.rstrip('\n').split(' ')) for line in file]
     shuffle(DS)
