@@ -13,18 +13,37 @@ ID = randint(10000,99999)
 
 def alg_katz(G,GTest):
     startTime = time.time() #BEGIN
+    GScoreRight = nx.Graph()
+    GScoreWrong = nx.Graph()
+    v = list(G.nodes())
+    nv = len(v)
     k = katz(G)
-    for i in G.nodes():
-        print(i)
-    print(k[0])
-    print(k.item((0,0)))
+    for i in range(0,nv):
+        for j in range(0,nv):
+            vi = v[i]
+            vj = v[j]
+            scoreK = k.item((i,j))
+            if scoreK > 0 and not i == j and not G.has_edge(vi,vj) and not GScoreRight.has_edge(vi,vj) and not GScoreWrong.has_edge(vi,vj):
+                if GTest.has_edge(vi,vj):
+                    GScoreRight.add_edge(vi,vj,score=scoreK)
+                else:
+                    GScoreWrong.add_edge(vi,vj,score=scoreK)
     finishTime = time.time() - startTime #END
     measures("KATZ", GTest, GScoreRight, GScoreWrong, finishTime)
 
 def alg_simrank(G,GTest):
     startTime = time.time() #BEGIN
-    s = simrank(G)
-    print(s)
+    GScoreRight = nx.Graph()
+    GScoreWrong = nx.Graph()
+    for t1,t2 in simrank(G).items():
+        for sc in t2.items():
+            sc0 = sc[0]
+            scoreSR = sc[1]
+            if scoreSR > 0 and not t1 == sc0 and not G.has_edge(t1,sc0) and not GScoreRight.has_edge(t1,sc0) and not GScoreWrong.has_edge(t1,sc0):
+                if GTest.has_edge(t1,sc0):
+                    GScoreRight.add_edge(t1,sc0,score=scoreSR)
+                else:
+                    GScoreWrong.add_edge(t1,sc0,score=scoreSR)
     finishTime = time.time() - startTime #END
     measures("SIMRANK", GTest, GScoreRight, GScoreWrong, finishTime)
 
@@ -33,11 +52,14 @@ def alg_adamic_adar(G,GTest):
     GScoreRight = nx.Graph()
     GScoreWrong = nx.Graph()
     for i in nx.adamic_adar_index(G):
+        i0 = i[0]
+        i1 = i[1]
+        i2 = i[2]
         if i[2] > 0:
-            if GTest.has_edge(i[0],i[1]):
-                GScoreRight.add_edge(i[0],i[1],score=i[2])
+            if GTest.has_edge(i0,i1):
+                GScoreRight.add_edge(i0,i1,score=i2)
             else:
-                GScoreWrong.add_edge(i[0],i[1],score=i[2])
+                GScoreWrong.add_edge(i0,i1,score=i2)
     finishTime = time.time() - startTime #END
     measures("ADAMIC-ADAR", GTest, GScoreRight, GScoreWrong, finishTime)
 
@@ -45,11 +67,11 @@ def alg_common_neighbors(G,GTest):
     startTime = time.time() #BEGIN
     GScoreRight = nx.Graph()
     GScoreWrong = nx.Graph()
-    nodeList = sorted(G.nodes())
+    nodeList = list(G.nodes())
     for n in nodeList:
         for nn in nx.non_neighbors(G,n):
             scoreCN = len(sorted(nx.common_neighbors(G,n,nn)))
-            if 0 < scoreCN:
+            if 0 < scoreCN  and not GScoreRight.has_edge(n,nn) and not GScoreWrong.has_edge(n,nn):
                 if GTest.has_edge(n,nn):
                     GScoreRight.add_edge(n,nn,score=scoreCN)
                 else:
@@ -77,7 +99,7 @@ def measures(ALG, GTest, GScoreRight, GScoreWrong, finishTime):
             nii += 1
     AUC = (ni + (nii * 0.5)) / n
     
-    file = open("Result"+str(ID)+".txt","a")
+    file = open(str(ID)+"_RESULT"+".txt","a")
     file.write(ALG+":")
     file.write("\n")
     file.write("  PRECISION: "+str(PRECISION)) 
@@ -87,9 +109,11 @@ def measures(ALG, GTest, GScoreRight, GScoreWrong, finishTime):
     file.write("  AUC: "+str(AUC))
     file.write("\n")
     file.write("\n")
- 
-    file.close() 
-    
+    file.close()
+
+    nx.write_edgelist(GScoreRight,str(ID)+"_GR_"+ALG,data=['score'])
+    nx.write_edgelist(GScoreWrong,str(ID)+"_GW_"+ALG,data=['score'])
+
 ##-------------------------------------------------------------------------------
 def katz(G, c=0.9, remove_neighbors=False, inv_method=0):
   if type(G) == nx.MultiGraph or type(G) == nx.MultiDiGraph:
@@ -178,10 +202,12 @@ if __name__ == "__main__":
     G.add_edges_from(DS[0:DSDiv])
     GTest = nx.Graph()
     GTest.add_edges_from(DS[DSDiv:DSLen])
-    #alg_common_neighbors(G,GTest)
-    #alg_adamic_adar(G,GTest)
-    #alg_katz(G,GTest)
-    #alg_simrank(G,GTest)
+    nx.write_edgelist(G,str(ID)+"_G")
+    nx.write_edgelist(GTest,str(ID)+"_GTest")
+    alg_common_neighbors(G,GTest)
+    alg_adamic_adar(G,GTest)
+    alg_katz(G,GTest)
+    alg_simrank(G,GTest)
 
 #nx.draw(G, with_labels=True, font_weight='bold')
 #plt.show()
