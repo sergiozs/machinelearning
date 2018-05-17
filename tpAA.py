@@ -9,8 +9,7 @@ import copy
 import sys
 from collections import defaultdict
 
-#ID = randint(10000,99999)
-ID = 17014
+ID = randint(10000,99999)
 
 def alg_katz(G,GTest):
     startTime = time.time() #BEGIN
