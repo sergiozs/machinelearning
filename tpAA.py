@@ -9,7 +9,8 @@ import copy
 import sys
 from collections import defaultdict
 
-ID = randint(10000,99999)
+#ID = randint(10000,99999)
+ID = 17014
 
 def alg_katz(G,GTest):
     startTime = time.time() #BEGIN
@@ -23,7 +24,7 @@ def alg_katz(G,GTest):
             vi = v[i]
             vj = v[j]
             scoreK = k.item((i,j))
-            if scoreK > 0 and not i == j and not G.has_edge(vi,vj) and not GScoreRight.has_edge(vi,vj) and not GScoreWrong.has_edge(vi,vj):
+            if scoreK > 0.000001 and not i == j and not G.has_edge(vi,vj) and not GScoreRight.has_edge(vi,vj) and not GScoreWrong.has_edge(vi,vj):
                 if GTest.has_edge(vi,vj):
                     GScoreRight.add_edge(vi,vj,score=scoreK)
                 else:
@@ -39,7 +40,7 @@ def alg_simrank(G,GTest):
         for sc in t2.items():
             sc0 = sc[0]
             scoreSR = sc[1]
-            if scoreSR > 0 and not t1 == sc0 and not G.has_edge(t1,sc0) and not GScoreRight.has_edge(t1,sc0) and not GScoreWrong.has_edge(t1,sc0):
+            if scoreSR > 0.000001 and not t1 == sc0 and not G.has_edge(t1,sc0) and not GScoreRight.has_edge(t1,sc0) and not GScoreWrong.has_edge(t1,sc0):
                 if GTest.has_edge(t1,sc0):
                     GScoreRight.add_edge(t1,sc0,score=scoreSR)
                 else:
@@ -136,7 +137,7 @@ def katz(G, c=0.9, remove_neighbors=False, inv_method=0):
   return S
 
 
-def simrank(G, c=0.9, max_iter=100, remove_neighbors=False, remove_self=False, dump_process=False):
+def simrank(G, c=0.9, max_iter=1, remove_neighbors=False, remove_self=False, dump_process=False):
   if type(G) == nx.MultiGraph or type(G) == nx.MultiDiGraph:
     raise Exception("simrank() not defined for graphs with multiedges.")
 
